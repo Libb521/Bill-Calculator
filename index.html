@@ -1153,6 +1153,7 @@
         // ─── INPUT MODE ───
         let inputMode = 'bill'; // 'bill' or 'kwh'
         let deliveryMode = 'email'; // 'email', 'whatsapp', or 'both'
+
         function toggleOtherLocation() {
             const county = document.getElementById('county').value;
             const otherGroup = document.getElementById('otherLocationGroup');
@@ -1164,6 +1165,31 @@
                 otherGroup.style.display = 'none';
                 otherInput.removeAttribute('required');
                 otherInput.value = '';
+            }
+        }
+
+        function setDeliveryMode(mode) {
+            deliveryMode = mode;
+            document.getElementById('deliveryEmail').classList.toggle('active', mode === 'email');
+            document.getElementById('deliveryWhatsapp').classList.toggle('active', mode === 'whatsapp');
+            document.getElementById('deliveryBoth').classList.toggle('active', mode === 'both');
+
+            const emailInput = document.getElementById('email');
+            const whatsappInput = document.getElementById('whatsapp');
+            const deliveryMessage = document.getElementById('deliveryMessage');
+
+            if (mode === 'email') {
+                emailInput.setAttribute('required', 'required');
+                whatsappInput.removeAttribute('required');
+                deliveryMessage.textContent = "We'll send the full PDF proposal to your email within 24 hours";
+            } else if (mode === 'whatsapp') {
+                emailInput.removeAttribute('required');
+                whatsappInput.setAttribute('required', 'required');
+                deliveryMessage.textContent = "We'll send the full PDF proposal to your WhatsApp within 24 hours";
+            } else {
+                emailInput.setAttribute('required', 'required');
+                whatsappInput.setAttribute('required', 'required');
+                deliveryMessage.textContent = "We'll send the full PDF proposal to your email and WhatsApp within 24 hours";
             }
         }
 
