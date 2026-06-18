@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solarglow Limited — Solar Savings Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sg-navy: #122454;
+            --sg-navy-light: #1a3270;
+            --sg-green: #3baf29;
+            --sg-green-light: #4dd13a;
+            --sg-green-dark: #2d8a1f;
+            --sg-orange: #f97316;
+            --sg-orange-light: #fb923c;
+            --sg-orange-dark: #ea580c;
+            --primary: var(--sg-orange);
+            --primary-dark: var(--sg-orange-dark);
+            --primary-light: #fff7ed;
+            --secondary: var(--sg-navy);
+            --secondary-light: var(--sg-navy-light);
+            --accent: var(--sg-green);
+            --accent-light: #dcfce7;
+            --accent-dark: var(--sg-green-dark);
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 4px; height: 4px;
+            background: rgba(59, 175, 41, 0.25);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 24px 16px 60px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0 32px;
+        }
+        .logo-img {
+            height: 52px;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+        }
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--sg-navy);
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+        .header h1 span { color: var(--sg-orange); }
+        .header p {
+            color: var(--sg-navy);
+            opacity: 0.7;
+            font-size: 0.95rem;
+            max-width: 380px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .input-section {
+            padding: 28px 24px;
+            background: linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
+            border-bottom: 1px solid #fed7aa;
+        }
+        .input-section label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--sg-navy);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+        }
+        .input-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 2px solid var(--sg-orange-light);
+            border-radius: 10px;
+            background: white;
+            color: var(--sg-navy);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .toggle-btn:hover {
+            border-color: var(--sg-orange);
+            background: #fff7ed;
+        }
+        .toggle-btn.active {
+            background: linear-gradient(135deg, var(--sg-orange) 0%, var(--sg-orange-dark) 100%);
+            color: white;
+            border-color: var(--sg-orange);
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+        }
+        .delivery-toggle {
+            display: flex;
+            gap: 8px;
+        }
+        .delivery-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            background: white;
+            color: var(--sg-navy);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .delivery-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        .delivery-btn:hover {
+            border-color: var(--sg-orange);
+            background: #fff7ed;
+        }
+        .delivery-btn.active {
+            background: linear-gradient(135deg, var(--sg-orange) 0%, var(--sg-orange-dark) 100%);
+            color: white;
+            border-color: var(--sg-orange);
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .currency-symbol {
+            position: absolute;
+            left: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--sg-navy);
+            pointer-events: none;
+        }
+        #kplcBill {
+            width: 100%;
+            padding: 16px 16px 16px 68px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--sg-navy);
+            border: 2px solid var(--sg-orange-light);
+            border-radius: var(--radius);
+            background: white;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        #kplcBill::placeholder { color: var(--gray-300); font-weight: 400; }
+        #kplcBill:focus {
+            outline: none;
+            border-color: var(--sg-orange);
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+        }
+        .input-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+        .input-hint svg { width: 14px; height: 14px; color: var(--sg-orange); }
+
+        .results-section {
+            padding: 0;
+            display: none;
+        }
+        .results-section.visible { display: block; animation: slideUp 0.5s ease; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--gray-100);
+            gap: 16px;
+            transition: background 0.2s;
+        }
+        .result-item:hover { background: var(--gray-50); }
+        .result-item:last-child { border-bottom: none; }
+
+        .result-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .result-icon.blue { background: #dbeafe; color: #2563eb; }
+        .result-icon.green { background: var(--accent-light); color: var(--sg-green); }
+        .result-icon.orange { background: var(--primary-light); color: var(--sg-orange); }
+        .result-icon.purple { background: #ede9fe; color: #7c3aed; }
+        .result-icon svg { width: 22px; height: 22px; }
+
+        .result-content { flex: 1; }
+        .result-label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .result-value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--sg-navy);
+        }
+        .result-value.green { color: var(--sg-green); }
+        .result-value.orange { color: var(--sg-orange); }
+        .result-value.purple { color: #7c3aed; }
+        .result-sublabel {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        .savings-highlight {
+            background: linear-gradient(135deg, #ecfdf5 0%, #dcfce7 100%);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-top: 1px solid #86efac;
+        }
+        .savings-highlight .result-icon { background: white; }
+        .savings-highlight .result-value { font-size: 1.6rem; }
+
+        .cta-section {
+            padding: 20px 24px 28px;
+            text-align: center;
+        }
+        .cta-btn {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, var(--sg-orange) 0%, var(--sg-orange-dark) 100%);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+        }
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.45);
+        }
+        .cta-btn:active { transform: translateY(0); }
+        .cta-btn svg { width: 18px; height: 18px; }
+        .cta-subtext {
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .cta-subtext svg { width: 14px; height: 14px; }
+
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            padding: 20px 0;
+            flex-wrap: wrap;
+        }
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--sg-navy);
+            opacity: 0.7;
+        }
+        .trust-badge svg { width: 16px; height: 16px; color: var(--sg-green); }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 36, 84, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            overflow-y: auto;
+        }
+        .popup-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .popup-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            max-width: 520px;
+            width: 100%;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .popup-overlay.visible .popup-card {
+            transform: scale(1) translateY(0);
+        }
+
+        /* ─── LIGHT BLUE GRADIENT HEADER FOR LOGO VISIBILITY ─── */
+        .popup-header {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+            padding: 28px 28px 24px;
+            text-align: center;
+            color: var(--sg-navy);
+            position: relative;
+            border-bottom: 1px solid #bae6fd;
+        }
+        .popup-close {
+            position: absolute;
+            top: 16px; right: 16px;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(18, 36, 84, 0.1);
+            border: none;
+            color: var(--sg-navy);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .popup-close:hover { background: rgba(18, 36, 84, 0.2); }
+        .popup-close svg { width: 16px; height: 16px; }
+        .popup-logo {
+            height: 48px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.1));
+        }
+        .popup-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--sg-navy);
+        }
+        .popup-header p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            line-height: 1.5;
+            color: var(--sg-navy);
+        }
+
+        .popup-body {
+            padding: 24px 28px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .popup-body .form-group {
+            margin-bottom: 16px;
+        }
+        .popup-body label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--sg-navy);
+            margin-bottom: 6px;
+        }
+        .popup-body input,
+        .popup-body select {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: white;
+            color: var(--sg-navy);
+        }
+        .popup-body input:focus,
+        .popup-body select:focus {
+            outline: none;
+            border-color: var(--sg-orange);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+        .popup-body input::placeholder { color: var(--gray-300); }
+
+        .popup-body .submit-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, var(--sg-orange) 0%, var(--sg-orange-dark) 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            margin-top: 8px;
+        }
+        .popup-body .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+        }
+        .popup-body .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .popup-footer {
+            text-align: center;
+            padding: 0 28px 24px;
+        }
+        .popup-footer p {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .popup-footer svg { width: 14px; height: 14px; }
+
+        .proposal-results {
+            display: none;
+            padding: 0;
+        }
+        .proposal-results.visible { display: block; animation: fadeIn 0.5s ease; }
+
+        /* ─── LIGHT BLUE GRADIENT HERO FOR LOGO VISIBILITY ─── */
+        .proposal-hero {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+            padding: 28px 28px 24px;
+            text-align: center;
+            color: var(--sg-navy);
+            position: relative;
+            border-bottom: 1px solid #bae6fd;
+        }
+        .proposal-hero .hero-logo {
+            height: 44px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.1));
+        }
+        .proposal-hero h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            opacity: 0.7;
+            margin-bottom: 8px;
+            color: var(--sg-navy);
+        }
+        .proposal-hero .hero-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--sg-orange);
+            line-height: 1;
+        }
+        .proposal-hero .hero-sublabel {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 6px;
+            color: var(--sg-navy);
+        }
+
+        .proposal-details {
+            padding: 24px 28px;
+        }
+        .detail-section {
+            margin-bottom: 24px;
+        }
+        .detail-section:last-child { margin-bottom: 0; }
+        .detail-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--sg-navy);
+            opacity: 0.6;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .detail-section-title svg { width: 14px; height: 14px; }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .spec-card {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-100);
+            border-radius: 10px;
+            padding: 14px 12px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .spec-card:hover {
+            border-color: var(--sg-orange);
+            background: #fff7ed;
+        }
+        .spec-card .spec-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 8px;
+        }
+        .spec-card .spec-icon.blue { background: #dbeafe; color: #2563eb; }
+        .spec-card .spec-icon.green { background: var(--accent-light); color: var(--sg-green); }
+        .spec-card .spec-icon.orange { background: var(--primary-light); color: var(--sg-orange); }
+        .spec-card .spec-icon.purple { background: #ede9fe; color: #7c3aed; }
+        .spec-card .spec-icon.red { background: #fee2e2; color: var(--danger); }
+        .spec-card .spec-icon svg { width: 16px; height: 16px; }
+        .spec-card .spec-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--sg-navy);
+        }
+        .spec-card .spec-label {
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .breakdown-table tr {
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .breakdown-table tr:last-child { border-bottom: none; }
+        .breakdown-table td {
+            padding: 10px 0;
+            font-size: 0.9rem;
+        }
+        .breakdown-table td:first-child {
+            color: var(--gray-500);
+        }
+        .breakdown-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: var(--sg-navy);
+        }
+        .breakdown-table tr.total td {
+            font-weight: 700;
+            color: var(--sg-navy);
+            font-size: 1rem;
+            padding-top: 12px;
+        }
+        .breakdown-table tr.total td:last-child {
+            color: var(--sg-orange);
+            font-size: 1.1rem;
+        }
+
+        .savings-timeline {
+            background: linear-gradient(135deg, #ecfdf5 0%, #dcfce7 100%);
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 16px;
+            border: 1px solid #86efac;
+        }
+        .savings-timeline h4 {
+            font-size: 0.85rem;
+            color: var(--sg-navy);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .timeline-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(59, 175, 41, 0.2);
+        }
+        .timeline-row:last-child { border-bottom: none; }
+        .timeline-row .timeline-label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+        .timeline-row .timeline-value {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--sg-green);
+        }
+
+        .proposal-cta {
+            padding: 0 28px 28px;
+            text-align: center;
+        }
+        .proposal-cta .cta-btn {
+            margin-bottom: 12px;
+        }
+        .proposal-cta p {
+            font-size: 0.8rem;
+            color: var(--gray-400);
+        }
+        .disclaimer-box {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: 1px solid #fed7aa;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            text-align: left;
+        }
+        .disclaimer-box svg {
+            width: 20px;
+            height: 20px;
+            color: var(--sg-orange);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .disclaimer-box p {
+            font-size: 0.82rem;
+            color: var(--sg-navy);
+            line-height: 1.5;
+            margin: 0;
+        }
+        .disclaimer-box p strong {
+            color: var(--sg-orange-dark);
+        }
+
+        .popup-success {
+            display: none;
+            text-align: center;
+            padding: 40px 28px;
+        }
+        .popup-success.visible { display: block; animation: fadeIn 0.5s ease; }
+        .success-ring {
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, var(--sg-green) 0%, var(--sg-green-dark) 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .success-ring svg { width: 36px; height: 36px; color: white; }
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        .popup-success h3 {
+            font-size: 1.3rem;
+            color: var(--sg-navy);
+            margin-bottom: 8px;
+        }
+        .popup-success p {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .popup-success .savings-recap {
+            background: var(--accent-light);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 20px 0;
+        }
+        .popup-success .savings-recap .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--sg-green);
+        }
+        .popup-success .savings-recap .label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 16px 12px 40px; }
+            .header h1 { font-size: 1.5rem; }
+            .input-section { padding: 20px 18px; }
+            #kplcBill { font-size: 1.4rem; padding: 14px 14px 14px 38px; }
+            .result-item { padding: 14px 18px; }
+            .result-value { font-size: 1.15rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .popup-card { border-radius: var(--radius-lg); max-height: 95vh; }
+            .spec-grid { grid-template-columns: 1fr 1fr; }
+            .proposal-hero .hero-value { font-size: 2rem; }
+        }
+    </style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <div class="header">
+            <img src="data:image/png;base64,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" alt="Solarglow Limited" class="logo-img">
+            <h1>See How Much You Could <span>Save</span> With Solar</h1>
+            <p>Enter your monthly KPLC bill and we'll instantly calculate your solar potential</p>
+        </div>
+
+        <div class="main-card">
+            <div class="input-section">
+                <label id="inputLabel">Your Monthly KPLC Bill</label>
+                <div class="input-toggle">
+                    <button type="button" class="toggle-btn active" id="toggleBill" onclick="setInputMode('bill')">KPLC Bill (KSh)</button>
+                    <button type="button" class="toggle-btn" id="toggleKwh" onclick="setInputMode('kwh')">Monthly Usage (kWh)</button>
+                </div>
+                <div class="input-wrapper">
+                    <span class="currency-symbol" id="inputSymbol">KSh</span>
+                    <input type="number" id="kplcBill" placeholder="0" min="0" step="100">
+                </div>
+                <div class="input-hint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <span id="inputHint">Based on KPLC domestic tariff: KSh 28/kWh (incl. levies)</span>
+                </div>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <div class="result-item">
+                    <div class="result-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                    <div class="result-content">
+                        <div class="result-label">Daily Energy Use</div>
+                        <div class="result-value" id="dailyUsageWh">—</div>
+                        <div class="result-sublabel">watt-hours per day</div>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-icon purple">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    <div class="result-content">
+                        <div class="result-label">Monthly Energy Consumption</div>
+                        <div class="result-value purple" id="monthlyKwh">—</div>
+                        <div class="result-sublabel">kilowatt-hours per month</div>
+                    </div>
+                </div>
+
+                <div class="savings-highlight">
+                    <div class="result-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div class="result-content">
+                        <div class="result-label">Estimated Monthly Savings</div>
+                        <div class="result-value green" id="monthlySavings">—</div>
+                        <div class="result-sublabel" id="savingsSub">vs. your current KPLC bill</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-section" id="ctaSection" style="display: none;">
+                <button class="cta-btn" id="getProposalBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Get My Free Solar Proposal
+                </button>
+                <div class="cta-subtext">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Full system specs, pricing & savings breakdown inside
+                </div>
+            </div>
+        </div>
+
+        <div class="trust-badges">
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Licensed & Insured</span>
+            </div>
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                <span>500+ Homes Powered</span>
+            </div>
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>24-Hour Response</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-card">
+            <!-- Form View -->
+            <div id="popupFormView">
+                <div class="popup-header">
+                    <button class="popup-close" id="popupClose">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                    <img src="data:image/png;base64,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" alt="Solarglow Limited" class="popup-logo">
+                    <h2>Get Your Detailed Proposal</h2>
+                    <p>Enter your details to receive a detailed Solarglow proposal within 24 hours</p>
+                </div>
+                <div class="popup-body">
+                    <form id="proposalForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <input type="text" id="firstName" placeholder="John" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <input type="text" id="lastName" placeholder="Doe" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="phone" placeholder="+254 7XX XXX XXX" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="email" placeholder="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>WhatsApp Number</label>
+                            <input type="tel" id="whatsapp" placeholder="+254 7XX XXX XXX">
+                        </div>
+                        <div class="form-group">
+                            <label>How would you like to receive your quotation?</label>
+                            <div class="delivery-toggle">
+                                <button type="button" class="delivery-btn active" id="deliveryEmail" onclick="setDeliveryMode('email')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                    Email
+                                </button>
+                                <button type="button" class="delivery-btn" id="deliveryWhatsapp" onclick="setDeliveryMode('whatsapp')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                                    WhatsApp
+                                </button>
+                                <button type="button" class="delivery-btn" id="deliveryBoth" onclick="setDeliveryMode('both')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                    Both
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Location / County</label>
+                            <select id="county" required onchange="toggleOtherLocation()">
+                                <option value="">Select your county</option>
+                                <option value="nairobi">Nairobi</option>
+                                <option value="kiambu">Kiambu</option>
+                                <option value="machakos">Machakos</option>
+                                <option value="kajiado">Kajiado</option>
+                                <option value="mombasa">Mombasa</option>
+                                <option value="nakuru">Nakuru</option>
+                                <option value="kisumu">Kisumu</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="otherLocationGroup" style="display:none;">
+                            <label>Please specify your location</label>
+                            <input type="text" id="otherLocation" placeholder="e.g. Eldoret, Meru, Thika...">
+                        </div>
+                        <div class="form-group">
+                            <label>Property Type</label>
+                            <select id="propertyType">
+                                <option value="">Select property type</option>
+                                <option value="residential">Residential Home</option>
+                                <option value="apartment">Apartment / Flat</option>
+                                <option value="commercial">Commercial Building</option>
+                                <option value="industrial">Industrial</option>
+                                <option value="institution">School / Institution</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            Send Me My Proposal →
+                        </button>
+                    </form>
+                </div>
+                <div class="popup-footer">
+                    <p>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Your information is secure and will never be shared.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Proposal Results View -->
+            <div class="proposal-results" id="proposalResults">
+                <div class="proposal-hero">
+                    <button class="popup-close" id="proposalClose" style="top:12px;right:12px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                    <img src="data:image/png;base64,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" alt="Solarglow Limited" class="hero-logo">
+                    <h3>Your Personalized Solar System</h3>
+                    <div class="hero-value" id="heroSystemSize">—</div>
+                    <div class="hero-sublabel">Recommended system size based on your <span id="heroInputLabel">monthly KPLC bill of KSh</span> <span id="heroBill">0</span></div>
+                </div>
+
+                <div class="proposal-details">
+                    <!-- System Specs -->
+                    <div class="detail-section">
+                        <div class="detail-section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                            System Specifications
+                        </div>
+                        <div class="spec-grid">
+                            <div class="spec-card">
+                                <div class="spec-icon orange">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                                </div>
+                                <div class="spec-value" id="specPanels">—</div>
+                                <div class="spec-label">Solar Panels</div>
+                            </div>
+                            <div class="spec-card">
+                                <div class="spec-icon blue">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><line x1="22" y1="11" x2="22" y2="13"/></svg>
+                                </div>
+                                <div class="spec-value" id="specPanelWatts">—</div>
+                                <div class="spec-label">Panel Wattage</div>
+                            </div>
+                            <div class="spec-card">
+                                <div class="spec-icon purple">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                </div>
+                                <div class="spec-value" id="specInverter">—</div>
+                                <div class="spec-label">Inverter Size</div>
+                            </div>
+                            <div class="spec-card">
+                                <div class="spec-icon green">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="16" height="10" rx="2"/><line x1="22" y1="11" x2="22" y2="13"/></svg>
+                                </div>
+                                <div class="spec-value" id="specBattery">—</div>
+                                <div class="spec-label">Battery Capacity</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Energy Profile -->
+                    <div class="detail-section">
+                        <div class="detail-section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            Energy Profile
+                        </div>
+                        <div class="spec-grid">
+                            <div class="spec-card">
+                                <div class="spec-icon blue">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
+                                </div>
+                                <div class="spec-value" id="profileDailyWh">—</div>
+                                <div class="spec-label">Daily Use (Wh)</div>
+                            </div>
+                            <div class="spec-card">
+                                <div class="spec-icon orange">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                </div>
+                                <div class="spec-value" id="profileMonthlyKwh">—</div>
+                                <div class="spec-label">Monthly Use (kWh)</div>
+                            </div>
+                            <div class="spec-card">
+                                <div class="spec-icon green">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                </div>
+                                <div class="spec-value" id="profileDailyGen">—</div>
+                                <div class="spec-label">Daily Generation</div>
+                            </div>
+                            <div class="spec-card">
+                                <div class="spec-icon purple">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                </div>
+                                <div class="spec-value" id="profileOffset">—</div>
+                                <div class="spec-label">Bill Offset</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cost Breakdown -->
+                    <div class="detail-section">
+                        <div class="detail-section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            Estimated Investment
+                        </div>
+                        <table class="breakdown-table">
+                            <tr>
+                                <td>Solar Panels (<span id="costPanelCount">—</span> × <span id="costPanelWatt">—</span>W @ KSh 24/W)</td>
+                                <td id="costPanelsTotal">—</td>
+                            </tr>
+                            <tr>
+                                <td>Inverter (<span id="costInverterSize">—</span>)</td>
+                                <td id="costInverterTotal">—</td>
+                            </tr>
+                            <tr>
+                                <td>Battery Bank (<span id="costBatterySize">—</span>)</td>
+                                <td id="costBatteryTotal">—</td>
+                            </tr>
+                            <tr>
+                                <td>Mounting Rails — Ironsheet Roof (<span id="costMountingCount">—</span> panels @ KSh 2,540)</td>
+                                <td id="costMounting">—</td>
+                            </tr>
+                            <tr>
+                                <td>Cables, Breakers & Accessories</td>
+                                <td id="costAccessories">—</td>
+                            </tr>
+                            <tr>
+                                <td>Installation & Labour (<span id="costInstallRate">—</span>)</td>
+                                <td id="costLabour">—</td>
+                            </tr>
+                            <tr class="total">
+                                <td>Total Estimated Cost</td>
+                                <td id="costTotal">—</td>
+                            </tr>
+                        </table>
+
+                        <div class="savings-timeline">
+                            <h4>📊 Savings Projection</h4>
+                            <div class="timeline-row">
+                                <span class="timeline-label">Monthly Savings</span>
+                                <span class="timeline-value" id="timelineMonthly">—</span>
+                            </div>
+                            <div class="timeline-row">
+                                <span class="timeline-label">Annual Savings</span>
+                                <span class="timeline-value" id="timelineAnnual">—</span>
+                            </div>
+                            <div class="timeline-row">
+                                <span class="timeline-label">5-Year Savings</span>
+                                <span class="timeline-value" id="timeline5Year">—</span>
+                            </div>
+                            <div class="timeline-row">
+                                <span class="timeline-label">Payback Period</span>
+                                <span class="timeline-value" id="timelinePayback">—</span>
+                            </div>
+                            <div class="timeline-row">
+                                <span class="timeline-label">25-Year Net Savings</span>
+                                <span class="timeline-value" id="timeline25Year">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="proposal-cta">
+                    <div class="disclaimer-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <p><strong>Important:</strong> This is an <strong>estimated quotation</strong> based on the information provided. Final pricing is <strong>subject to change</strong> after an actual site survey.</p>
+                    </div>
+                    <button class="cta-btn" id="confirmProposalBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        Yes, Send Me This Proposal
+                    </button>
+                    <p id="deliveryMessage">We'll send the full PDF proposal to your email within 24 hours</p>
+                </div>
+            </div>
+
+            <!-- Final Success -->
+            <div class="popup-success" id="popupSuccess">
+                <div class="success-ring">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h3>Proposal Request Sent!</h3>
+                <p>We've received your details and will prepare your personalized Solarglow proposal within 24 hours.</p>
+                <div class="savings-recap">
+                    <div class="label">Your Estimated Monthly Savings</div>
+                    <div class="value" id="successSavings">KSh 0</div>
+                </div>
+                <p style="margin-top: 16px; font-size: 0.85rem;">A confirmation has been sent to your email.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── TARIFF & SYSTEM CONSTANTS ───
+        const KPLC_RATE_PER_KWH = 28;
+        const PEAK_SUN_HOURS = 4.5;
+        const SYSTEM_EFFICIENCY = 0.78;
+        const PANEL_WATTAGE = 550;
+        const BATTERY_KWH_PER_KW = 2.5;
+        const INSTALL_COST_PER_KW = 15000;
+        const ACCESSORIES_PERCENT = 0.08;
+
+        // ─── INPUT MODE ───
+        let inputMode = 'bill'; // 'bill' or 'kwh'
+
+        function toggleOtherLocation() {
+            const county = document.getElementById('county').value;
+            const otherGroup = document.getElementById('otherLocationGroup');
+            const otherInput = document.getElementById('otherLocation');
+            if (county === 'other') {
+                otherGroup.style.display = 'block';
+                otherInput.setAttribute('required', 'required');
+            } else {
+                otherGroup.style.display = 'none';
+                otherInput.removeAttribute('required');
+                otherInput.value = '';
+            }
+        }
+
+        function setInputMode(mode) {
+            inputMode = mode;
+            const toggleBill = document.getElementById('toggleBill');
+            const toggleKwh = document.getElementById('toggleKwh');
+            const inputLabel = document.getElementById('inputLabel');
+            const inputSymbol = document.getElementById('inputSymbol');
+            const inputHint = document.getElementById('inputHint');
+            const kplcBillInput = document.getElementById('kplcBill');
+
+            if (mode === 'bill') {
+                toggleBill.classList.add('active');
+                toggleKwh.classList.remove('active');
+                inputLabel.textContent = 'Your Monthly KPLC Bill';
+                inputSymbol.textContent = 'KSh';
+                inputSymbol.style.left = '16px';
+                kplcBillInput.style.paddingLeft = '68px';
+                inputHint.textContent = 'Based on KPLC domestic tariff: KSh 28/kWh (incl. levies)';
+            } else {
+                toggleBill.classList.remove('active');
+                toggleKwh.classList.add('active');
+                inputLabel.textContent = 'Your Monthly Energy Usage';
+                inputSymbol.textContent = 'kWh';
+                inputSymbol.style.left = '16px';
+                kplcBillInput.style.paddingLeft = '68px';
+                inputHint.textContent = 'Enter your total monthly consumption in kilowatt-hours';
+            }
+            // Clear input and results when switching modes
+            kplcBillInput.value = '';
+            resultsSection.classList.remove('visible');
+            ctaSection.style.display = 'none';
+        }
+
+        // ─── EXACT INVERTER PRICING TIERS ───
+        const INVERTER_TIERS = [
+            { kw: 0.9, price: 27040 },
+            { kw: 1.8, price: 32955 },
+            { kw: 3.6, price: 65065 },
+            { kw: 5,  price: 65000 },
+            { kw: 6,  price: 91000 },
+            { kw: 8,  price: 200200 },
+            { kw: 10, price: 286000 },
+            { kw: 12, price: 299000 },
+            { kw: 15, price: 350000 },
+            { kw: 20, price: 320415 }
+        ];
+
+        // ─── EXACT BATTERY PRICING TIERS ───
+        const BATTERY_TIERS = [
+            { kwh: 5.12,  price: 143000 },
+            { kwh: 10.24, price: 221000 },
+            { kwh: 14.3,  price: 260000 }
+        ];
+
+        // ─── MOUNTING RAILS ───
+        const MOUNTING_COST_PER_PANEL = 2540;
+
+        // ─── PANEL COST ───
+        const PANEL_COST_PER_WATT = 24;
+
+        // ─── DOM ───
+        const kplcBillInput = document.getElementById('kplcBill');
+        const resultsSection = document.getElementById('resultsSection');
+        const ctaSection = document.getElementById('ctaSection');
+        const getProposalBtn = document.getElementById('getProposalBtn');
+        const popupOverlay = document.getElementById('popupOverlay');
+        const popupClose = document.getElementById('popupClose');
+        const proposalClose = document.getElementById('proposalClose');
+        const proposalForm = document.getElementById('proposalForm');
+        const popupFormView = document.getElementById('popupFormView');
+        const proposalResults = document.getElementById('proposalResults');
+        const popupSuccess = document.getElementById('popupSuccess');
+        const confirmProposalBtn = document.getElementById('confirmProposalBtn');
+
+        let currentCalcData = null;
+        let formDataStore = null;
+
+        // ─── Particles ───
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 15 + 's';
+                p.style.animationDuration = (10 + Math.random() * 10) + 's';
+                p.style.width = (2 + Math.random() * 4) + 'px';
+                p.style.height = p.style.width;
+                container.appendChild(p);
+            }
+        }
+        createParticles();
+
+        function formatKES(amount) {
+            return 'KSh ' + Math.round(amount).toLocaleString('en-KE');
+        }
+
+        // ─── GET INVERTER PRICE (closest tier, round up) ───
+        function getInverterPrice(kw) {
+            for (let tier of INVERTER_TIERS) {
+                if (tier.kw >= kw) {
+                    return { kw: tier.kw, price: tier.price };
+                }
+            }
+            const last = INVERTER_TIERS[INVERTER_TIERS.length - 1];
+            return { kw: last.kw, price: last.price };
+        }
+
+        // ─── GET BATTERY PRICE (closest tier, round up) ───
+        function getBatteryPrice(kwh) {
+            for (let tier of BATTERY_TIERS) {
+                if (tier.kwh >= kwh) {
+                    return { kwh: tier.kwh, price: tier.price };
+                }
+            }
+            const last = BATTERY_TIERS[BATTERY_TIERS.length - 1];
+            return { kwh: last.kwh, price: last.price };
+        }
+
+        // ─── CALCULATE ───
+        function calculateSolar(inputValue) {
+            let monthlyKwh, billAmount;
+            if (inputMode === 'bill') {
+                billAmount = inputValue;
+                monthlyKwh = billAmount / KPLC_RATE_PER_KWH;
+            } else {
+                monthlyKwh = inputValue;
+                billAmount = monthlyKwh * KPLC_RATE_PER_KWH;
+            }
+            const dailyKwh = monthlyKwh / 30;
+            const dailyWh = dailyKwh * 1000;
+
+            const dailyGenNeeded = dailyKwh / SYSTEM_EFFICIENCY;
+            const solarKw = Math.ceil(dailyGenNeeded / PEAK_SUN_HOURS * 10) / 10;
+            const numPanels = Math.ceil((solarKw * 1000) / PANEL_WATTAGE);
+            const actualSolarKw = (numPanels * PANEL_WATTAGE) / 1000;
+
+            const monthlyGen = actualSolarKw * PEAK_SUN_HOURS * 30 * SYSTEM_EFFICIENCY;
+            const offsetPercent = Math.min(0.90, monthlyGen / monthlyKwh);
+            const monthlySavings = monthlyKwh * offsetPercent * KPLC_RATE_PER_KWH;
+
+            const inverterKw = Math.ceil(actualSolarKw * 1.1 * 10) / 10;
+            const inverterMatch = getInverterPrice(inverterKw);
+
+            const batteryKwh = Math.ceil(actualSolarKw * BATTERY_KWH_PER_KW * 10) / 10;
+            const batteryMatch = getBatteryPrice(batteryKwh);
+
+            const panelCost = numPanels * PANEL_WATTAGE * PANEL_COST_PER_WATT;
+            const inverterCost = inverterMatch.price;
+            const batteryCost = batteryMatch.price;
+            const mountingCost = numPanels * MOUNTING_COST_PER_PANEL;
+            const installationCost = actualSolarKw * INSTALL_COST_PER_KW;
+            const hardwareTotal = panelCost + inverterCost + batteryCost + mountingCost + installationCost;
+            const accessoriesCost = hardwareTotal * ACCESSORIES_PERCENT;
+            const totalCost = hardwareTotal + accessoriesCost;
+
+            const annualSavings = monthlySavings * 12;
+            const paybackYears = totalCost / annualSavings;
+
+            return {
+                monthlyKwh: Math.round(monthlyKwh),
+                dailyKwh: dailyKwh.toFixed(1),
+                dailyWh: Math.round(dailyWh),
+                solarKw: actualSolarKw.toFixed(1),
+                numPanels: numPanels,
+                inverterKw: inverterMatch.kw,
+                inverterActual: inverterKw.toFixed(1),
+                batteryKwh: batteryMatch.kwh,
+                batteryActual: batteryKwh.toFixed(1),
+                monthlyGen: Math.round(monthlyGen),
+                monthlySavings: Math.round(monthlySavings),
+                offsetPercent: (offsetPercent * 100).toFixed(0),
+                totalCost: Math.round(totalCost),
+                paybackYears: paybackYears.toFixed(1),
+                panelCost: Math.round(panelCost),
+                inverterCost: Math.round(inverterCost),
+                batteryCost: Math.round(batteryCost),
+                mountingCost: Math.round(mountingCost),
+                installationCost: Math.round(installationCost),
+                accessoriesCost: Math.round(accessoriesCost),
+                annualSavings: Math.round(annualSavings),
+                savings5Year: Math.round(annualSavings * 5),
+                savings25Year: Math.round(annualSavings * 25 - totalCost)
+            };
+        }
+
+        // ─── UPDATE MAIN CARD ───
+        function updateResults(inputValue) {
+            if (!inputValue || inputValue <= 0) {
+                resultsSection.classList.remove('visible');
+                ctaSection.style.display = 'none';
+                return;
+            }
+
+            const data = calculateSolar(inputValue);
+            currentCalcData = data;
+
+            document.getElementById('dailyUsageWh').textContent = data.dailyWh.toLocaleString() + ' Wh';
+            document.getElementById('monthlyKwh').textContent = data.monthlyKwh.toLocaleString() + ' kWh';
+            document.getElementById('monthlySavings').textContent = formatKES(data.monthlySavings);
+            document.getElementById('savingsSub').textContent = data.offsetPercent + '% of your bill offset';
+
+            resultsSection.classList.add('visible');
+            ctaSection.style.display = 'block';
+        }
+
+        let debounceTimer;
+        kplcBillInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                updateResults(parseFloat(this.value));
+            }, 300);
+        });
+
+        // ─── POPUP ───
+        function openPopup() {
+            popupOverlay.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+            popupFormView.style.display = 'block';
+            proposalResults.classList.remove('visible');
+            popupSuccess.classList.remove('visible');
+            proposalForm.reset();
+        }
+
+        function closePopup() {
+            popupOverlay.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+
+        getProposalBtn.addEventListener('click', openPopup);
+        popupClose.addEventListener('click', closePopup);
+        if (proposalClose) proposalClose.addEventListener('click', closePopup);
+        popupOverlay.addEventListener('click', function(e) {
+            if (e.target === popupOverlay) closePopup();
+        });
+
+        // ─── SHOW PROPOSAL RESULTS ───
+        function showProposalResults(data, inputValue) {
+            document.getElementById('heroSystemSize').textContent = data.solarKw + ' kW Solar System';
+            const heroInputLabel = document.getElementById('heroInputLabel');
+            const heroBill = document.getElementById('heroBill');
+            if (inputMode === 'bill') {
+                heroInputLabel.textContent = 'monthly KPLC bill of KSh ';
+                heroBill.textContent = Math.round(inputValue).toLocaleString();
+            } else {
+                heroInputLabel.textContent = 'monthly energy usage of ';
+                heroBill.textContent = Math.round(inputValue).toLocaleString() + ' kWh';
+            }
+
+            document.getElementById('specPanels').textContent = data.numPanels + ' panels';
+            document.getElementById('specPanelWatts').textContent = PANEL_WATTAGE + 'W';
+            document.getElementById('specInverter').textContent = data.inverterKw + ' kW';
+            document.getElementById('specBattery').textContent = data.batteryKwh + ' kWh';
+
+            document.getElementById('profileDailyWh').textContent = data.dailyWh.toLocaleString() + ' Wh';
+            document.getElementById('profileMonthlyKwh').textContent = data.monthlyKwh.toLocaleString() + ' kWh';
+            document.getElementById('profileDailyGen').textContent = Math.round(data.monthlyGen / 30).toLocaleString() + ' kWh';
+            document.getElementById('profileOffset').textContent = data.offsetPercent + '%';
+
+            document.getElementById('costPanelCount').textContent = data.numPanels;
+            document.getElementById('costPanelWatt').textContent = PANEL_WATTAGE;
+            document.getElementById('costPanelsTotal').textContent = formatKES(data.panelCost);
+            document.getElementById('costInverterSize').textContent = data.inverterKw + ' kW';
+            document.getElementById('costInverterTotal').textContent = formatKES(data.inverterCost);
+            document.getElementById('costBatterySize').textContent = data.batteryKwh + ' kWh';
+            document.getElementById('costBatteryTotal').textContent = formatKES(data.batteryCost);
+            document.getElementById('costMountingCount').textContent = data.numPanels;
+            document.getElementById('costMounting').textContent = formatKES(data.mountingCost);
+            document.getElementById('costAccessories').textContent = formatKES(data.accessoriesCost);
+            document.getElementById('costInstallRate').textContent = 'KSh ' + INSTALL_COST_PER_KW.toLocaleString() + '/kW';
+            document.getElementById('costLabour').textContent = formatKES(data.installationCost);
+            document.getElementById('costTotal').textContent = formatKES(data.totalCost);
+
+            document.getElementById('timelineMonthly').textContent = formatKES(data.monthlySavings);
+            document.getElementById('timelineAnnual').textContent = formatKES(data.annualSavings);
+            document.getElementById('timeline5Year').textContent = formatKES(data.savings5Year);
+            document.getElementById('timelinePayback').textContent = data.paybackYears + ' years';
+            document.getElementById('timeline25Year').textContent = formatKES(data.savings25Year);
+
+            popupFormView.style.display = 'none';
+            proposalResults.classList.add('visible');
+            popupSuccess.classList.remove('visible');
+        }
+
+        // ─── FORM SUBMIT → SHOW PROPOSAL ───
+        proposalForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const inputValue = parseFloat(kplcBillInput.value) || 0;
+            const data = calculateSolar(inputValue);
+
+            formDataStore = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                deliveryMode: deliveryMode,
+                county: document.getElementById('county').value,
+                otherLocation: document.getElementById('otherLocation').value,
+                propertyType: document.getElementById('propertyType').value,
+                inputMode: inputMode,
+                inputValue: inputValue,
+                kplcBill: data.billAmount,
+                ...data
+            };
+
+            showProposalResults(data, inputValue);
+        });
+
+        // ─── CONFIRM → SUCCESS ───
+        confirmProposalBtn.addEventListener('click', function() {
+            const inputValue = parseFloat(kplcBillInput.value) || 0;
+            const data = calculateSolar(inputValue);
+
+            console.log('Final lead submitted:', formDataStore);
+
+            document.getElementById('successSavings').textContent = formatKES(data.monthlySavings);
+            proposalResults.classList.remove('visible');
+            popupSuccess.classList.add('visible');
+
+            // Production: send to backend
+            // fetch('/api/leads', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(formDataStore)
+            // });
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && popupOverlay.classList.contains('visible')) {
+                closePopup();
+            }
+        });
+    </script>
+</body>
+</html>
